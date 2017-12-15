@@ -1,27 +1,27 @@
-package service_test
+package dictionary_test
 
 import (
 	"testing"
 
-	"github.com/derailed/hangman2/internal/service"
+	"github.com/derailed/hangman2/internal/dictionary"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateGoodFile(t *testing.T) {
-	wl, err := service.InitWordList()
+	wl, err := dictionary.InitWordList()
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 8881, len(wl))
 }
 
 func TestCreateBadFile(t *testing.T) {
-	_, err := service.NewWordList("assets/words_toast.txt")
+	_, err := dictionary.NewWordList("assets/words_toast.txt")
 
 	assert.EqualError(t, err, "No word list file found!: open assets/words_toast.txt: no such file or directory")
 }
 
 func TestRandomWord(t *testing.T) {
-	wl, _ := service.InitWordList()
+	wl, _ := dictionary.InitWordList()
 
 	word := wl.RandomWord()
 	if len(word) == 0 {

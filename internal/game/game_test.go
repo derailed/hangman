@@ -1,50 +1,50 @@
-package service_test
+package game_test
 
 import (
 	"testing"
 
-	"github.com/derailed/hangman2/internal/service"
+	"github.com/derailed/hangman2/internal/game"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGoodGuess(t *testing.T) {
-	game := service.NewGame("blee")
+	game := game.NewGame("blee")
 	game, tally := game.Guess('e')
 
-	assert.Equal(t, service.Status(service.Good), tally.Status)
+	assert.Equal(t, game.Status(game.Good), tally.Status)
 	assert.Equal(t, 7, tally.TurnsLeft)
 	assert.Equal(t, "_ _ e e", tally.Letters)
 
-	assert.Equal(t, service.Status(service.Good), game.Status)
+	assert.Equal(t, game.Status(game.Good), game.Status)
 	assert.Equal(t, 7, game.TurnsLeft)
 	assert.Equal(t, "blee", game.Letters)
 	assert.Equal(t, []rune{'e'}, game.Guesses)
 }
 
 func TestBadGuess(t *testing.T) {
-	game := service.NewGame("blee")
+	game := game.NewGame("blee")
 	game, tally := game.Guess('z')
 
-	assert.Equal(t, service.Status(service.Bad), tally.Status)
+	assert.Equal(t, game.Status(game.Bad), tally.Status)
 	assert.Equal(t, 6, tally.TurnsLeft)
 	assert.Equal(t, "_ _ _ _", tally.Letters)
 
-	assert.Equal(t, service.Status(service.Bad), game.Status)
+	assert.Equal(t, game.Status(game.Bad), game.Status)
 	assert.Equal(t, 6, game.TurnsLeft)
 	assert.Equal(t, "blee", game.Letters)
 	assert.Equal(t, []rune{'z'}, game.Guesses)
 }
 
 func TestAlreadyGuessed(t *testing.T) {
-	game := service.NewGame("blee")
+	game := game.NewGame("blee")
 	game, _ = game.Guess('b')
 	game, tally := game.Guess('b')
 
-	assert.Equal(t, service.Status(service.Guessed), tally.Status)
+	assert.Equal(t, game.Status(game.Guessed), tally.Status)
 	assert.Equal(t, 7, tally.TurnsLeft)
 	assert.Equal(t, "b _ _ _", tally.Letters)
 
-	assert.Equal(t, service.Status(service.Guessed), game.Status)
+	assert.Equal(t, game.Status(game.Guessed), game.Status)
 	assert.Equal(t, 7, game.TurnsLeft)
 	assert.Equal(t, "blee", game.Letters)
 	assert.Equal(t, []rune{'b'}, game.Guesses)
@@ -53,15 +53,15 @@ func TestAlreadyGuessed(t *testing.T) {
 func TestWin(t *testing.T) {
 	guesses := []struct {
 		g rune
-		s service.Status
+		s game.Status
 	}{
-		{g: 'b', s: service.Good},
-		{g: 'l', s: service.Good},
-		{g: 'e', s: service.Won},
+		{g: 'b', s: game.Good},
+		{g: 'l', s: game.Good},
+		{g: 'e', s: game.Won},
 	}
 
-	game := service.NewGame("blee")
-	var tally service.Tally
+	game := game.NewGame("blee")
+	var tally game.Tally
 	for _, r := range guesses {
 		game, tally = game.Guess(r.g)
 		assert.Equal(t, r.s, tally.Status)
@@ -70,19 +70,19 @@ func TestWin(t *testing.T) {
 func TestLoose(t *testing.T) {
 	guesses := []struct {
 		g rune
-		s service.Status
+		s game.Status
 	}{
-		{g: 'q', s: service.Bad},
-		{g: 'r', s: service.Bad},
-		{g: 's', s: service.Bad},
-		{g: 'u', s: service.Bad},
-		{g: 'v', s: service.Bad},
-		{g: 'x', s: service.Bad},
-		{g: 'z', s: service.Lost},
+		{g: 'q', s: game.Bad},
+		{g: 'r', s: game.Bad},
+		{g: 's', s: game.Bad},
+		{g: 'u', s: game.Bad},
+		{g: 'v', s: game.Bad},
+		{g: 'x', s: game.Bad},
+		{g: 'z', s: game.Lost},
 	}
 
-	game := service.NewGame("blee")
-	var tally service.Tally
+	game := game.NewGame("blee")
+	var tally game.Tally
 	for _, r := range guesses {
 		game, tally = game.Guess(r.g)
 		assert.Equal(t, r.s, tally.Status)

@@ -1,4 +1,4 @@
-package service
+package dictionary
 
 type (
 	// RandomWordService interact with an underlying word list
