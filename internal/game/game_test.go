@@ -8,7 +8,7 @@ import (
 )
 
 func TestGoodGuess(t *testing.T) {
-	g := game.NewGame("blee")
+	g, _ := game.NewGame("blee")
 	g, tally := g.Guess('e')
 
 	assert.Equal(t, game.Status(game.Good), tally.Status)
@@ -22,7 +22,7 @@ func TestGoodGuess(t *testing.T) {
 }
 
 func TestBadGuess(t *testing.T) {
-	g := game.NewGame("blee")
+	g, _ := game.NewGame("blee")
 	g, tally := g.Guess('z')
 
 	assert.Equal(t, game.Status(game.Bad), tally.Status)
@@ -36,7 +36,7 @@ func TestBadGuess(t *testing.T) {
 }
 
 func TestAlreadyGuessed(t *testing.T) {
-	g := game.NewGame("blee")
+	g, _ := game.NewGame("blee")
 	g, _ = g.Guess('b')
 	g, tally := g.Guess('b')
 
@@ -60,8 +60,7 @@ func TestWin(t *testing.T) {
 		{g: 'e', s: game.Won},
 	}
 
-	g := game.NewGame("blee")
-	var tally game.Tally
+	g, tally := game.NewGame("blee")
 	for _, r := range guesses {
 		g, tally = g.Guess(r.g)
 		assert.Equal(t, r.s, tally.Status)
@@ -81,8 +80,7 @@ func TestLoose(t *testing.T) {
 		{g: 'z', s: game.Lost},
 	}
 
-	g := game.NewGame("blee")
-	var tally game.Tally
+	g, tally := game.NewGame("blee")
 	for _, r := range guesses {
 		g, tally = g.Guess(r.g)
 		assert.Equal(t, r.s, tally.Status)

@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind:       Ingress
+metadata:
+  name: hangman
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /dictionary/v1/.*
+        backend:
+          serviceName: dictionary
+          servicePort: 9094
+      - path: /game/v1/.*
+        backend:
+          serviceName: game
+          servicePort: 9095

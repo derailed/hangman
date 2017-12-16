@@ -1,0 +1,32 @@
+---
+# Dictionary all
+apiVersion: config.istio.io/v1alpha2
+kind:       RouteRule
+metadata:
+  name: dic-all
+spec:
+  precedence: 1
+  destination:
+    name: dictionary
+  route:
+  - labels:
+      version: v1
+    weight: 50
+  - labels:
+      version: v2
+    weight: 50
+
+---
+# Game all
+apiVersion: config.istio.io/v1alpha2
+kind:       RouteRule
+metadata:
+  name: game-v1
+spec:
+  precedence: 1
+  destination:
+    name: game
+  route:
+  - labels:
+      version: v1
+    weight: 100

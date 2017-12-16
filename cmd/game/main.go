@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -14,11 +15,17 @@ import (
 
 const port = ":9095"
 
+const localDic = "http://localhost:9094"
+
 func main() {
+	dicUrl := flag.String("url", localDic, "Dictionary Host URL")
+
+	flag.Parse()
+
 	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
-	svc := game.NewService()
+	svc := game.NewService(*dicUrl)
 	svc = game.NewLoggingService(svc, logger)
 
 	mux := http.NewServeMux()

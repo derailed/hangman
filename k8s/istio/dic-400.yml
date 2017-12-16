@@ -1,0 +1,15 @@
+apiVersion: config.istio.io/v1alpha2
+kind:       RouteRule
+metadata:
+  name: dictionary-400
+spec:
+  precedence: 2
+  destination:
+    name: dictionary
+  route:
+  - labels:
+    version: v1
+  httpFault:
+    abort:
+      percent:    100
+      httpStatus: 400

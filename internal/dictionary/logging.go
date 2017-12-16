@@ -17,13 +17,15 @@ func NewLoggingService(s Service, l log.Logger) Service {
 }
 
 // NewGame logging wrapper
-func (mw loggingService) Word() string {
+func (mw loggingService) Word() (word string) {
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "word",
+			"word", word,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
 
-	return mw.Service.Word()
+	word = mw.Service.Word()
+	return
 }

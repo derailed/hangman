@@ -16,22 +16,33 @@ type (
 	randomWordResponse struct {
 		Word string `json:"word"`
 	}
+
+	pingResponse struct {
+		Status string `json:"status"`
+	}
 )
 
-// DecodeRandomWordRequest - no opt
 func decodeRandomWordRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	return "", nil
 }
 
-// EncodeResponse to json
+func decodePingRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	return "", nil
+}
+
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	return json.NewEncoder(w).Encode(response)
 }
 
-// MakeRandomWordEndPoint create a endpoint for a service
 func makeRandomWordEndPoint(svc Service) endpoint.Endpoint {
 	return func(_ context.Context, _ interface{}) (interface{}, error) {
 		return randomWordResponse{Word: svc.Word()}, nil
+	}
+}
+
+func makePingEndPoint(svc Service) endpoint.Endpoint {
+	return func(_ context.Context, _ interface{}) (interface{}, error) {
+		return pingResponse{Status: "ok"}, nil
 	}
 }
 
@@ -48,8 +59,16 @@ func MakeHandler(svc Service, logger kitlog.Logger) http.Handler {
 		opts...,
 	)
 
+	pingHandler := kithttp.NewServer(
+		makePingEndPoint(svc),
+		decodePingRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	r := mux.NewRouter()
 
+	r.Handle("/dictionary/v1/health", pingHandler).Methods("GET")
 	r.Handle("/dictionary/v1/random_word", randomWordHandler).Methods("GET")
 
 	return r

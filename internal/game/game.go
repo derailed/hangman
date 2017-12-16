@@ -39,11 +39,11 @@ type (
 )
 
 // NewGame of hangman
-func NewGame(word string) *Game {
+func NewGame(word string) (*Game, Tally) {
 	// Need to talk to word list and get rand word
 	g := Game{Status: Started, TurnsLeft: 7, Letters: word, Guesses: []rune{}}
 
-	return &g
+	return g.returnWithTally()
 }
 
 func (g *Game) returnWithTally() (*Game, Tally) {

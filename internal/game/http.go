@@ -16,12 +16,20 @@ import (
 const dictionary_url = "http://localhost:9090/dictionary/v1/random_word"
 
 type (
-	newGameRequest struct {
+	newRequest struct {
 		Word string `json:"word"`
 	}
 
-	newGameResponse struct {
-		Game *Game `json:"game"`
+	newResponse struct {
+		Game  *Game `json:"game"`
+		Tally Tally `json:"tally"`
+	}
+
+	pingRequest struct {
+	}
+
+	pingResponse struct {
+		Status string `json:"status"`
 	}
 
 	guessRequest struct {
@@ -35,7 +43,11 @@ type (
 	}
 )
 
-func decodeNewGameRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeNewRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	return nil, nil
+}
+
+func decodePingRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	return nil, nil
 }
 
@@ -52,14 +64,65 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 	return json.NewEncoder(w).Encode(response)
 }
 
-func makeNewGameEndPoint(svc Service) endpoint.Endpoint {
+func makePingEndPoint(svc Service) endpoint.Endpoint {
 	return func(_ context.Context, _ interface{}) (interface{}, error) {
-		word, err := getWord("http://dictionary:9090/dictionary/v1/random_word")
+		return pingResponse{Status: "ok"}, nil
+	}
+}
+
+func makeNewEndPoint(svc Service) endpoint.Endpoint {
+	return func(_ context.Context, _ interface{}) (interface{}, error) {
+		word, err := getWord(svc.DictionaryURL())
 		if err != nil {
 			return nil, err
 		}
-		return newGameResponse{Game: svc.NewGame(word)}, nil
+		game, tally := svc.NewGame(word)
+		return newResponse{Game: game, Tally: tally}, nil
 	}
+}
+
+func makeGuessEndPoint(svc Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(guessRequest)
+		game, tally := svc.Guess(req.Game, req.Guess)
+		return guessResponse{Game: game, Tally: tally}, nil
+	}
+}
+
+// MakeHandler to serve game routes
+func MakeHandler(svc Service, logger kitlog.Logger) http.Handler {
+	opts := []kithttp.ServerOption{
+		kithttp.ServerErrorLogger(logger),
+	}
+
+	pingHandler := kithttp.NewServer(
+		makePingEndPoint(svc),
+		decodePingRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	newHandler := kithttp.NewServer(
+		makeNewEndPoint(svc),
+		decodeNewRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	guessHandler := kithttp.NewServer(
+		makeGuessEndPoint(svc),
+		decodeGuessRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	r := mux.NewRouter()
+
+	r.Handle("/game/v1/health", pingHandler)
+	r.Handle("/game/v1/new_game", newHandler)
+	r.Handle("/game/v1/guess", guessHandler).Methods("POST")
+
+	return r
 }
 
 func getWord(url string) (string, error) {
@@ -86,40 +149,4 @@ func getWord(url string) (string, error) {
 		return "", err
 	}
 	return res["word"].(string), nil
-}
-
-func makeGuessEndPoint(svc Service) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(guessRequest)
-		game, tally := svc.Guess(req.Game, req.Guess)
-		return guessResponse{Game: game, Tally: tally}, nil
-	}
-}
-
-// MakeHandler to serve game routes
-func MakeHandler(svc Service, logger kitlog.Logger) http.Handler {
-	opts := []kithttp.ServerOption{
-		kithttp.ServerErrorLogger(logger),
-	}
-
-	newGameHandler := kithttp.NewServer(
-		makeNewGameEndPoint(svc),
-		decodeNewGameRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	guessHandler := kithttp.NewServer(
-		makeGuessEndPoint(svc),
-		decodeGuessRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	r := mux.NewRouter()
-
-	r.Handle("/game/v1/new_game", newGameHandler).Methods("GET")
-	r.Handle("/game/v1/guess", guessHandler).Methods("POST")
-
-	return r
 }

@@ -1,0 +1,15 @@
+kind:       Service
+apiVersion: v1
+metadata:
+  name: dictionary
+  labels:
+    group: hangman
+    app:   dictionary
+spec:
+  selector:
+    app: dictionary
+  ports:
+    - name:       http
+      protocol:   TCP
+      port:       9094
+      targetPort: 9094

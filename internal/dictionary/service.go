@@ -1,7 +1,7 @@
 package dictionary
 
 type (
-	// RandomWordService interact with an underlying word list
+	// Service interact with an underlying word list
 	Service interface {
 		Word() string
 	}
@@ -12,8 +12,8 @@ type (
 )
 
 // New dictionary service
-func New() (Service, error) {
-	list, err := InitWordList()
+func New(path string) (Service, error) {
+	list, err := NewWordList(path)
 	if err != nil {
 		return service{}, err
 	}

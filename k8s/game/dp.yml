@@ -1,0 +1,36 @@
+kind:       Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: game-v1
+  labels:
+    group: hangman
+    app:   game
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        group:   hangman
+        app:     game
+        version: v1
+    spec:
+      imagePullSecrets:
+      - name: quay-secret
+      containers:
+      - name:            game
+        image:           quay.io/derailed/hangman:1.0
+        imagePullPolicy: IfNotPresent
+        args:            ["--url", "http://dictionary:9094"]
+        livenessProbe:
+          httpGet:
+            path: /game/v1/health
+            port: 9095
+          initialDelaySeconds: 15
+          timeoutSeconds:      15
+        resources:
+          limits:
+            cpu:    0.5m
+            memory: 4Mi
+        ports:
+        - name:          http
+          containerPort: 9095

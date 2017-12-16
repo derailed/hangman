@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,13 +13,19 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-const port = ":9090"
+const port = ":9094"
 
 func main() {
+	dic := flag.String("dic", "standard", "Indicates which dictionary to use")
+
+	flag.Parse()
+
 	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
-	svc, err := dictionary.New()
+	logger.Log("dictionary", *dic)
+
+	svc, err := dictionary.New(fmt.Sprintf("assets/%s.txt", *dic))
 	if err != nil {
 		panic(err)
 	}
