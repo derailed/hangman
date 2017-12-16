@@ -1,0 +1,9 @@
+{
+  "guess": "g",
+  "game": {
+    "letters": "fred",
+    "status": 5,
+    "turnsLeft": 7,
+    "guesses": []
+  }
+}

@@ -2,24 +2,25 @@ package dictionary
 
 type (
 	// RandomWordService interact with an underlying word list
-	RandomWordService interface {
+	Service interface {
 		Word() string
 	}
 
-	randomWordService struct {
+	service struct {
 		list WordList
 	}
 )
 
-func InitSvc() (randomWordService, error) {
+// New dictionary service
+func New() (Service, error) {
 	list, err := InitWordList()
 	if err != nil {
-		return randomWordService{}, err
+		return service{}, err
 	}
-	return randomWordService{list: list}, nil
+	return service{list: list}, nil
 }
 
 // NewWord fetches a new random word for the words list
-func (s randomWordService) Word() string {
+func (s service) Word() string {
 	return s.list.RandomWord()
 }

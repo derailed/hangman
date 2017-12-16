@@ -1,9 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
+	"github.com/derailed/hangman2/internal/cors"
 	"github.com/derailed/hangman2/internal/game"
 	"github.com/go-kit/kit/log"
 )
@@ -11,29 +15,26 @@ import (
 const port = ":9095"
 
 func main() {
-	logger := log.NewLogfmtLogger(os.Stderr)
+	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
-	var svc game.GameService
+	svc := game.NewService()
+	svc = game.NewLoggingService(svc, logger)
 
-	svc, err := game.InitGameSvc()
-	if err != nil {
-		panic(err)
-	}
+	mux := http.NewServeMux()
+	mux.Handle("/game/v1/", game.MakeHandler(svc, logger))
+	http.Handle("/", cors.AccessControl(mux))
 
-	newGameHandler := kithttp.NewServer(
-		game.MakeNewGameEndPoint(svc),
-		game.DecodeNewGameRequest,
-		game.EncodeResponse,
-	)
+	errs := make(chan error, 2)
+	go func() {
+		logger.Log("msg", "HTTP", "addr", port)
+		errs <- http.ListenAndServe(port, nil)
+	}()
+	go func() {
+		c := make(chan os.Signal)
+		signal.Notify(c, syscall.SIGINT)
+		errs <- fmt.Errorf("%s", <-c)
+	}()
 
-	guessHandler := kithttp.NewServer(
-		game.MakeGuessEndPoint(svc),
-		game.DecodeGuessRequest,
-		game.EncodeResponse,
-	)
-
-	http.Handle("/new_game", newGameHandler)
-	http.Handle("/guess", guessHandler)
-	logger.Log("msg", "HTTP", "addr", port)
-	logger.Log("err", http.ListenAndServe(port, nil))
+	logger.Log("terminated", <-errs)
 }

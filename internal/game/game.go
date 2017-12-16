@@ -14,30 +14,34 @@ const (
 )
 
 type (
+	// Status of game
 	Status int
 
+	// Guesser protocol to guess a letter for hangman
 	Guesser interface {
 		Guess(rune) (*Game, Tally)
 	}
 
+	// Game records state for hangman
 	Game struct {
-		Letters   string `json:"letter"`
+		Letters   string `json:"letters"`
 		Status    Status `json:"status"`
-		TurnsLeft int    `json:"turns_left`
-		Guesses   []rune `json:"guesses`
+		TurnsLeft int    `json:"turnsLeft"`
+		Guesses   []rune `json:"guesses"`
 	}
 
+	// Tally tracks the user score
 	Tally struct {
 		Status    Status `json:"status"`
-		TurnsLeft int    `json:"turns_left`
-		Letters   string `json:"letters`
+		TurnsLeft int    `json:"turns_left"`
+		Letters   string `json:"letters"`
 	}
 )
 
 // NewGame of hangman
 func NewGame(word string) *Game {
 	// Need to talk to word list and get rand word
-	g := Game{Status: Started, TurnsLeft: 7, Letters: word}
+	g := Game{Status: Started, TurnsLeft: 7, Letters: word, Guesses: []rune{}}
 
 	return &g
 }

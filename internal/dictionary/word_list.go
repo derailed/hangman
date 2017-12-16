@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const path = "../../assets/words.txt"
+const path = "assets/words.txt"
 
 type (
 	// Randomizer selects a word at random
