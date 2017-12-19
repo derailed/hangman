@@ -16,7 +16,6 @@ func EncodeResponse(_ context.Context, w http.ResponseWriter, resp interface{}) 
 
 // Call a web service with the given url and parameters
 func Call(method, url string, payload io.Reader, res interface{}) error {
-	fmt.Println("Calling", url)
 	req, err := http.NewRequest(method, url, payload)
 	if err != nil {
 		return err
@@ -32,7 +31,5 @@ func Call(method, url string, payload io.Reader, res interface{}) error {
 		return fmt.Errorf("doh!! %s failed", url)
 	}
 
-	err = json.NewDecoder(resp.Body).Decode(&res)
-	fmt.Println("RES", res)
-	return err
+	return json.NewDecoder(resp.Body).Decode(&res)
 }

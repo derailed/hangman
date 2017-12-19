@@ -9,11 +9,6 @@ import (
 	"github.com/derailed/hangman/internal/svc"
 )
 
-type result struct {
-	Game  game.Game `json:"game"`
-	Tally Tally     `json:"tally"`
-}
-
 func gameURL(url, path string) string {
 	return fmt.Sprintf("%s/game/v1/%s", url, path)
 }
