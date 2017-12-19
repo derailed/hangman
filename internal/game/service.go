@@ -1,13 +1,12 @@
 package game
 
 type (
-	// Service represent a hangman game interaction
-	Service interface {
-		NewGame(string) (Game, Tally)
-		Guess(Game, string) (Game, Tally)
-	}
+	service struct{}
 
-	service struct {
+	// Service represents the game service
+	Service interface {
+		NewGame(string) Game
+		Guess(Game, rune) Game
 	}
 )
 
@@ -17,12 +16,11 @@ func NewService() Service {
 }
 
 // NewGame starts a new hangman game
-func (s *service) NewGame(word string) (Game, Tally) {
-	game, tally := NewGame(word)
-	return game, tally
+func (s *service) NewGame(word string) Game {
+	return *NewGame(word)
 }
 
-// Guess a letter
-func (s *service) Guess(g Game, l string) (Game, Tally) {
-	return g.Guess(rune(l[0]))
+// Guess the next letter
+func (s *service) Guess(g Game, l rune) Game {
+	return *g.Guess(l)
 }

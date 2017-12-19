@@ -8,112 +8,73 @@ import (
 
 	"github.com/ant0ine/go-json-rest/rest/test"
 	"github.com/derailed/hangman2/internal/game"
+	"github.com/derailed/hangman2/internal/svc"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewGame(t *testing.T) {
-	svc := game.NewService()
+	g := newGame(t, "fred")
 
-	mux := http.NewServeMux()
-	mux.Handle("/game/v1/", game.MakeHandler(svc, nil))
-
-	payload := game.NewGameRequest{Word: "fred"}
-	req := test.MakeSimpleRequest("POST", MakeURL("game/v1/new_game"), payload)
-	req.Header.Set("Content-Type", "application/json")
-
-	recorded := test.RunRequest(
-		t,
-		mux,
-		req,
-	)
-
-	recorded.CodeIs(http.StatusOK)
-	recorded.ContentTypeIsJson()
-
-	var res game.NewGameResponse
-	recorded.DecodeJsonPayload(&res)
-	assert.Equal(t, "fred", res.Game.Letters)
-	assert.Equal(t, 7, res.Game.TurnsLeft)
-	assert.Equal(t, game.Status(game.Started), res.Game.Status)
-	assert.Equal(t, "_ _ _ _", res.Tally.Letters)
+	assert.Equal(t, "fred", g.Letters)
+	assert.Equal(t, 7, g.TurnsLeft)
+	assert.Equal(t, game.Status(game.Started), g.Status)
 }
 
 func TestGuessApi(t *testing.T) {
-	svc := game.NewService()
-
-	mux := http.NewServeMux()
-	mux.Handle("/game/v1/", game.MakeHandler(svc, nil))
-
+	mux := makeMux()
 	g := newGame(t, "fred")
-
 	payload := game.GuessRequest{Game: g, Guess: "f"}
-	req := test.MakeSimpleRequest("POST", MakeURL("game/v1/guess"), payload)
-	req.Header.Set("Content-Type", "application/json")
-
-	recorded := test.RunRequest(
-		t,
-		mux,
-		req,
-	)
-
+	recorded := test.RunRequest(t, mux, makeRequest("POST", "guess", payload))
 	recorded.CodeIs(http.StatusOK)
 	recorded.ContentTypeIsJson()
 
-	var res game.GuessResponse
+	var res game.Response
 	recorded.DecodeJsonPayload(&res)
 
-	assert.Equal(t, 7, res.Tally.TurnsLeft)
-	assert.Equal(t, "f _ _ _", res.Tally.Letters)
+	assert.Equal(t, 7, res.Game.TurnsLeft)
+	assert.Equal(t, "fred", res.Game.Letters)
 }
 
 func TestStatusCall(t *testing.T) {
-	svc := game.NewService()
+	mux := makeMux()
 
-	mux := http.NewServeMux()
-	mux.Handle("/game/v1/", game.MakeHandler(svc, nil))
-
-	req := test.MakeSimpleRequest("GET", MakeURL("game/v1/health"), nil)
-	req.Header.Set("Content-Type", "application/json")
-
-	recorded := test.RunRequest(
-		t,
-		mux,
-		req,
-	)
-
+	recorded := test.RunRequest(t, mux, makeRequest("GET", "health", nil))
 	recorded.CodeIs(http.StatusOK)
 	recorded.ContentTypeIsJson()
 
-	var res game.HealthResponse
+	var res svc.HealthResponse
 	recorded.DecodeJsonPayload(&res)
 
 	assert.Equal(t, "ok", res.Status)
 }
 
-func MakeURL(path string) string {
-	return fmt.Sprintf("http://%s/%s", httptest.DefaultRemoteAddr, path)
+func newGame(t *testing.T, word string) game.Game {
+	mux := makeMux()
+
+	payload := game.NewGameRequest{Word: "fred"}
+	recorded := test.RunRequest(t, mux, makeRequest("POST", "new_game", payload))
+	recorded.CodeIs(http.StatusOK)
+	recorded.ContentTypeIsJson()
+
+	var res game.Response
+	recorded.DecodeJsonPayload(&res)
+	return res.Game
 }
 
-func newGame(t *testing.T, word string) game.Game {
+func makeURL(action string) string {
+	return fmt.Sprintf("http://%s/game/v1/%s", httptest.DefaultRemoteAddr, action)
+}
+
+func makeMux() *http.ServeMux {
 	svc := game.NewService()
 
 	mux := http.NewServeMux()
 	mux.Handle("/game/v1/", game.MakeHandler(svc, nil))
+	return mux
+}
 
-	payload := game.NewGameRequest{Word: word}
-	req := test.MakeSimpleRequest("POST", MakeURL("game/v1/new_game"), payload)
+func makeRequest(method, action string, payload interface{}) *http.Request {
+	req := test.MakeSimpleRequest(method, makeURL(action), payload)
 	req.Header.Set("Content-Type", "application/json")
-
-	recorded := test.RunRequest(
-		t,
-		mux,
-		req,
-	)
-
-	recorded.CodeIs(http.StatusOK)
-	recorded.ContentTypeIsJson()
-
-	var res game.NewGameResponse
-	recorded.DecodeJsonPayload(&res)
-	return res.Game
+	return req
 }

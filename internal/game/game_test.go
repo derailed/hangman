@@ -8,12 +8,8 @@ import (
 )
 
 func TestGoodGuess(t *testing.T) {
-	g, _ := game.NewGame("blee")
-	g, tally := g.Guess('e')
-
-	assert.Equal(t, game.Status(game.Good), tally.Status)
-	assert.Equal(t, 7, tally.TurnsLeft)
-	assert.Equal(t, "_ _ e e", tally.Letters)
+	g := game.NewGame("blee")
+	g = g.Guess('e')
 
 	assert.Equal(t, game.Status(game.Good), g.Status)
 	assert.Equal(t, 7, g.TurnsLeft)
@@ -22,12 +18,8 @@ func TestGoodGuess(t *testing.T) {
 }
 
 func TestBadGuess(t *testing.T) {
-	g, _ := game.NewGame("blee")
-	g, tally := g.Guess('z')
-
-	assert.Equal(t, game.Status(game.Bad), tally.Status)
-	assert.Equal(t, 6, tally.TurnsLeft)
-	assert.Equal(t, "_ _ _ _", tally.Letters)
+	g := game.NewGame("blee")
+	g = g.Guess('z')
 
 	assert.Equal(t, game.Status(game.Bad), g.Status)
 	assert.Equal(t, 6, g.TurnsLeft)
@@ -36,13 +28,9 @@ func TestBadGuess(t *testing.T) {
 }
 
 func TestAlreadyGuessed(t *testing.T) {
-	g, _ := game.NewGame("blee")
-	g, _ = g.Guess('b')
-	g, tally := g.Guess('b')
-
-	assert.Equal(t, game.Status(game.Guessed), tally.Status)
-	assert.Equal(t, 7, tally.TurnsLeft)
-	assert.Equal(t, "b _ _ _", tally.Letters)
+	g := game.NewGame("blee")
+	g = g.Guess('b')
+	g = g.Guess('b')
 
 	assert.Equal(t, game.Status(game.Guessed), g.Status)
 	assert.Equal(t, 7, g.TurnsLeft)
@@ -60,10 +48,10 @@ func TestWin(t *testing.T) {
 		{g: 'e', s: game.Won},
 	}
 
-	g, tally := game.NewGame("blee")
+	g := game.NewGame("blee")
 	for _, r := range guesses {
-		g, tally = g.Guess(r.g)
-		assert.Equal(t, r.s, tally.Status)
+		g = g.Guess(r.g)
+		assert.Equal(t, r.s, g.Status)
 	}
 }
 func TestLoose(t *testing.T) {
@@ -80,9 +68,9 @@ func TestLoose(t *testing.T) {
 		{g: 'z', s: game.Lost},
 	}
 
-	g, tally := game.NewGame("blee")
+	g := game.NewGame("blee")
 	for _, r := range guesses {
-		g, tally = g.Guess(r.g)
-		assert.Equal(t, r.s, tally.Status)
+		g = g.Guess(r.g)
+		assert.Equal(t, r.s, g.Status)
 	}
 }

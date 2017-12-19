@@ -5,11 +5,17 @@ import (
 )
 
 const (
+	// Won indicates the game ended with a win
 	Won = iota
+	// Lost indicates the game ended with a loss
 	Lost
+	// Good indicates a correct guess
 	Good
+	// Bad indicates a bad guess
 	Bad
+	// Guessed indicates a letter was already guessed
 	Guessed
+	// Started indicates the game begun
 	Started
 )
 
@@ -19,7 +25,7 @@ type (
 
 	// Guesser protocol to guess a letter for hangman
 	Guesser interface {
-		Guess(rune) (*Game, Tally)
+		Guess(rune) *Game
 	}
 
 	// Game records state for hangman
@@ -29,32 +35,19 @@ type (
 		TurnsLeft int    `json:"turnsLeft"`
 		Guesses   []rune `json:"guesses"`
 	}
-
-	// Tally tracks the user score
-	Tally struct {
-		Status    Status `json:"status"`
-		TurnsLeft int    `json:"turns_left"`
-		Letters   string `json:"letters"`
-	}
 )
 
-// NewGame of hangman
-func NewGame(word string) (Game, Tally) {
-	// Need to talk to word list and get rand word
+// NewGame starts a hangman game
+func NewGame(word string) *Game {
 	g := Game{Status: Started, TurnsLeft: 7, Letters: word, Guesses: []rune{}}
-
-	return g.returnWithTally()
-}
-
-func (g *Game) returnWithTally() (Game, Tally) {
-	return *g, g.tallyFromGame()
+	return &g
 }
 
 // Guess a letter in the selected word
-func (g *Game) Guess(l rune) (Game, Tally) {
+func (g *Game) Guess(l rune) *Game {
 	if g.alreadyGuessed(l) {
 		g.Status = Guessed
-		return g.returnWithTally()
+		return g
 	}
 
 	if g.inWord(l) {
@@ -64,7 +57,7 @@ func (g *Game) Guess(l rune) (Game, Tally) {
 		} else {
 			g.Status = Good
 		}
-		return g.returnWithTally()
+		return g
 	}
 
 	g.Guesses = append(g.Guesses, l)
@@ -74,7 +67,7 @@ func (g *Game) Guess(l rune) (Game, Tally) {
 	} else {
 		g.Status = Bad
 	}
-	return g.returnWithTally()
+	return g
 }
 
 func (g *Game) isWon() bool {
@@ -84,14 +77,6 @@ func (g *Game) isWon() bool {
 		}
 	}
 	return true
-}
-
-func (g *Game) tallyFromGame() Tally {
-	return Tally{
-		Status:    g.Status,
-		TurnsLeft: g.TurnsLeft,
-		Letters:   g.obfuscate(),
-	}
 }
 
 func (g *Game) obfuscate() string {

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/derailed/hangman2/internal/svc"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/gorilla/mux"
 
@@ -15,31 +16,20 @@ import (
 const dictionary_url = "http://localhost:9090/dictionary/v1/random_word"
 
 type (
+	// NewGameRequest requests a new game given a word
 	NewGameRequest struct {
 		Word    string         `json:"word"`
 		Cookies []*http.Cookie `json:"cookies"`
 	}
-
-	NewGameResponse struct {
-		Game  Game  `json:"game"`
-		Tally Tally `json:"tally"`
+	// Response replies with the current game
+	Response struct {
+		Game Game `json:"game"`
 	}
 
-	healthRequest struct {
-	}
-
-	HealthResponse struct {
-		Status string `json:"status"`
-	}
-
+	// GuessRequest proposes a new guess
 	GuessRequest struct {
 		Game  Game   `json:"game"`
 		Guess string `json:"guess"`
-	}
-
-	GuessResponse struct {
-		Game  Game  `json:"game"`
-		Tally Tally `json:"tally"`
 	}
 )
 
@@ -53,10 +43,6 @@ func decodeNewGameRequest(_ context.Context, r *http.Request) (interface{}, erro
 	return req, nil
 }
 
-func decodeHealthRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	return healthRequest{}, nil
-}
-
 func decodeGuessRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req GuessRequest
 
@@ -66,63 +52,45 @@ func decodeGuessRequest(_ context.Context, r *http.Request) (interface{}, error)
 	return req, nil
 }
 
-func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	w.Header().Add("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(response)
-}
-
-func makeHealthEndPoint(svc Service) endpoint.Endpoint {
-	return func(_ context.Context, _ interface{}) (interface{}, error) {
-		return HealthResponse{Status: "ok"}, nil
-	}
-}
-
-func makeNewGameEndPoint(svc Service) endpoint.Endpoint {
+func makeNewGameEndPoint(s Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(NewGameRequest)
-		game, tally := svc.NewGame(req.Word)
-		return NewGameResponse{Game: game, Tally: tally}, nil
+		game := s.NewGame(req.Word)
+		return Response{Game: game}, nil
 	}
 }
 
-func makeGuessEndPoint(svc Service) endpoint.Endpoint {
+func makeGuessEndPoint(s Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(GuessRequest)
-		game, tally := svc.Guess(req.Game, req.Guess)
-		return GuessResponse{Game: game, Tally: tally}, nil
+		game := s.Guess(req.Game, rune(req.Guess[0]))
+		return Response{Game: game}, nil
 	}
 }
 
 // MakeHandler to serve game routes
-func MakeHandler(svc Service, logger kitlog.Logger) http.Handler {
+func MakeHandler(s Service, l kitlog.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
-		kithttp.ServerErrorLogger(logger),
+		kithttp.ServerErrorLogger(l),
 	}
 
-	pingHandler := kithttp.NewServer(
-		makeHealthEndPoint(svc),
-		decodeHealthRequest,
-		encodeResponse,
-		opts...,
-	)
-
 	newGameHandler := kithttp.NewServer(
-		makeNewGameEndPoint(svc),
+		makeNewGameEndPoint(s),
 		decodeNewGameRequest,
-		encodeResponse,
+		svc.EncodeResponse,
 		opts...,
 	)
 
 	guessHandler := kithttp.NewServer(
-		makeGuessEndPoint(svc),
+		makeGuessEndPoint(s),
 		decodeGuessRequest,
-		encodeResponse,
+		svc.EncodeResponse,
 		opts...,
 	)
 
 	r := mux.NewRouter()
 
-	r.Handle("/game/v1/health", pingHandler)
+	r.Handle("/game/v1/health", svc.MakeHealthHandler(opts))
 	r.Handle("/game/v1/new_game", newGameHandler).Methods("POST")
 	r.Handle("/game/v1/guess", guessHandler).Methods("POST")
 
