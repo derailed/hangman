@@ -3,7 +3,7 @@ package game_test
 import (
 	"testing"
 
-	"github.com/derailed/hangman2/internal/game"
+	"github.com/derailed/hangman/internal/game"
 	"github.com/stretchr/testify/assert"
 )
 

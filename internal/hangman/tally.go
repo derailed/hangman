@@ -3,7 +3,7 @@ package hangman
 import (
 	"strings"
 
-	"github.com/derailed/hangman2/internal/game"
+	"github.com/derailed/hangman/internal/game"
 )
 
 // Tally tracks the user score

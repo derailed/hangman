@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/derailed/hangman2/internal/game"
-	"github.com/derailed/hangman2/internal/hangman"
-	"github.com/derailed/hangman2/internal/svc"
+	"github.com/derailed/hangman/internal/game"
+	"github.com/derailed/hangman/internal/hangman"
+	"github.com/derailed/hangman/internal/svc"
 )
 
 func svcURL(url, action string) string {

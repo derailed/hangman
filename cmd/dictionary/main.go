@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/derailed/hangman2/internal/cors"
-	"github.com/derailed/hangman2/internal/dictionary"
+	"github.com/derailed/hangman/internal/cors"
+	"github.com/derailed/hangman/internal/dictionary"
 	"github.com/go-kit/kit/log"
 )
 

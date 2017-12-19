@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/ant0ine/go-json-rest/rest/test"
-	"github.com/derailed/hangman2/internal/game"
-	"github.com/derailed/hangman2/internal/svc"
+	"github.com/derailed/hangman/internal/game"
+	"github.com/derailed/hangman/internal/svc"
 	"github.com/stretchr/testify/assert"
 )
 

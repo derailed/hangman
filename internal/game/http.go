@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/derailed/hangman2/internal/svc"
+	"github.com/derailed/hangman/internal/svc"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/gorilla/mux"
 

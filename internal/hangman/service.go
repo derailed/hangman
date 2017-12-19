@@ -3,7 +3,7 @@ package hangman
 import (
 	"net/http"
 
-	"github.com/derailed/hangman2/internal/game"
+	"github.com/derailed/hangman/internal/game"
 )
 
 type (

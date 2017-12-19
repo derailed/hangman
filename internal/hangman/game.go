@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/derailed/hangman2/internal/game"
-	"github.com/derailed/hangman2/internal/svc"
+	"github.com/derailed/hangman/internal/game"
+	"github.com/derailed/hangman/internal/svc"
 )
 
 type result struct {

@@ -3,7 +3,7 @@ package dictionary_test
 import (
 	"testing"
 
-	"github.com/derailed/hangman2/internal/dictionary"
+	"github.com/derailed/hangman/internal/dictionary"
 	"github.com/stretchr/testify/assert"
 )
 

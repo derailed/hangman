@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/derailed/hangman2/internal/dictionary"
-	"github.com/derailed/hangman2/internal/svc"
+	"github.com/derailed/hangman/internal/dictionary"
+	"github.com/derailed/hangman/internal/svc"
 )
 
 func dicURL(url, path string) string {

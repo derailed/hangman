@@ -3,8 +3,8 @@ package cli
 import (
 	"fmt"
 
-	"github.com/derailed/hangman2/internal/game"
-	"github.com/derailed/hangman2/internal/hangman"
+	"github.com/derailed/hangman/internal/game"
+	"github.com/derailed/hangman/internal/hangman"
 )
 
 // Display the current game state
