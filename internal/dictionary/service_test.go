@@ -12,28 +12,16 @@ import (
 )
 
 func TestNoAssets(t *testing.T) {
-	_, err := dictionary.New("assets/word.txt")
+	_, err := dictionary.NewService("assets/word.txt")
 	if err == nil {
 		t.Fatalf("Should flag no assets")
 	}
 }
 
 func TestRandomWordCall(t *testing.T) {
-	svc, err := dictionary.New("assets/words.txt")
-	assert.Equal(t, nil, err)
+	mux := createMux(t)
 
-	mux := http.NewServeMux()
-	mux.Handle("/dictionary/v1/", dictionary.MakeHandler(svc, nil))
-
-	req := test.MakeSimpleRequest("GET", MakeURL("dictionary/v1/random_word"), nil)
-	req.Header.Set("Content-Type", "application/json")
-
-	recorded := test.RunRequest(
-		t,
-		mux,
-		req,
-	)
-
+	recorded := test.RunRequest(t, mux, makeRequest("GET", "random_word"))
 	recorded.CodeIs(http.StatusOK)
 	recorded.ContentTypeIsJson()
 
@@ -44,30 +32,33 @@ func TestRandomWordCall(t *testing.T) {
 }
 
 func TestStatusCall(t *testing.T) {
-	svc, err := dictionary.New("assets/words.txt")
-	assert.Equal(t, nil, err)
+	mux := createMux(t)
 
-	mux := http.NewServeMux()
-	mux.Handle("/dictionary/v1/", dictionary.MakeHandler(svc, nil))
-
-	req := test.MakeSimpleRequest("GET", MakeURL("dictionary/v1/health"), nil)
-	req.Header.Set("Content-Type", "application/json")
-
-	recorded := test.RunRequest(
-		t,
-		mux,
-		req,
-	)
-
+	recorded := test.RunRequest(t, mux, makeRequest("GET", "health"))
 	recorded.CodeIs(http.StatusOK)
 	recorded.ContentTypeIsJson()
 
 	res := map[string]string{}
 	recorded.DecodeJsonPayload(&res)
-
 	assert.Equal(t, "ok", res["status"])
 }
 
-func MakeURL(path string) string {
-	return fmt.Sprintf("http://%s/%s", httptest.DefaultRemoteAddr, path)
+func MakeURL(action string) string {
+	return fmt.Sprintf("http://%s/dictionary/v1/%s", httptest.DefaultRemoteAddr, action)
+}
+
+func makeRequest(method, action string) *http.Request {
+	req := test.MakeSimpleRequest(method, MakeURL(action), nil)
+	req.Header.Set("Content-Type", "application/json")
+	return req
+}
+
+func createMux(t *testing.T) *http.ServeMux {
+	svc, err := dictionary.NewService("assets/words.txt")
+	assert.Equal(t, nil, err)
+
+	mux := http.NewServeMux()
+	mux.Handle("/dictionary/v1/", dictionary.MakeHandler(svc, nil))
+
+	return mux
 }

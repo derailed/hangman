@@ -8,21 +8,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-const path = "assets/words.txt"
-
 type (
-	// Randomizer selects a word at random
+	// Randomizer selects a random word for a collection of words
 	Randomizer interface {
-		randomWord() string
+		Word() string
 	}
 	// WordList stores a collection of words
 	WordList []string
 )
-
-// Init dictionary from default word list
-func InitWordList() (WordList, error) {
-	return NewWordList(path)
-}
 
 // NewWordList creates a new wordlist from the given file
 func NewWordList(path string) (WordList, error) {
@@ -33,8 +26,8 @@ func NewWordList(path string) (WordList, error) {
 	return wl, nil
 }
 
-// RandomWord returns a new word randomly from the list
-func (wl WordList) RandomWord() string {
+// Word returns a new word randomly from the list
+func (wl WordList) Word() string {
 	return wl[rand.Intn(len(wl))]
 }
 

@@ -8,7 +8,7 @@ import (
 )
 
 func TestCreateGoodFile(t *testing.T) {
-	wl, err := dictionary.InitWordList()
+	wl, err := dictionary.NewWordList("assets/words.txt")
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 5, len(wl))
@@ -21,9 +21,9 @@ func TestCreateBadFile(t *testing.T) {
 }
 
 func TestRandomWord(t *testing.T) {
-	wl, _ := dictionary.InitWordList()
+	wl, _ := dictionary.NewWordList("assets/words.txt")
 
-	word := wl.RandomWord()
+	word := wl.Word()
 	if len(word) == 0 {
 		t.Fatalf("Unable to fetch random word")
 	}

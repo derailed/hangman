@@ -7,12 +7,12 @@ import (
 )
 
 type loggingService struct {
-	Service
+	Randomizer
 	logger log.Logger
 }
 
 // NewLoggingService returns a new instance to the logging service
-func NewLoggingService(s Service, l log.Logger) Service {
+func NewLoggingService(s Randomizer, l log.Logger) Randomizer {
 	return &loggingService{s, l}
 }
 
@@ -26,6 +26,6 @@ func (mw loggingService) Word() (word string) {
 		)
 	}(time.Now())
 
-	word = mw.Service.Word()
+	word = mw.Randomizer.Word()
 	return
 }

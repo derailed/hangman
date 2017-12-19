@@ -12,7 +12,8 @@ import (
 	kithttp "github.com/go-kit/kit/transport/http"
 )
 
-type RandomWordResponse struct {
+// WordResponse returns a new word
+type WordResponse struct {
 	Word string `json:"word"`
 }
 
@@ -20,14 +21,14 @@ func decodeRandomWordRequest(_ context.Context, r *http.Request) (interface{}, e
 	return "", nil
 }
 
-func makeRandomWordEndPoint(svc Service) endpoint.Endpoint {
+func makeRandomWordEndPoint(svc Randomizer) endpoint.Endpoint {
 	return func(_ context.Context, _ interface{}) (interface{}, error) {
-		return RandomWordResponse{Word: svc.Word()}, nil
+		return WordResponse{Word: svc.Word()}, nil
 	}
 }
 
 // MakeHandler to service route requests
-func MakeHandler(s Service, l kitlog.Logger) http.Handler {
+func MakeHandler(s Randomizer, l kitlog.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorLogger(l),
 	}
@@ -40,7 +41,6 @@ func MakeHandler(s Service, l kitlog.Logger) http.Handler {
 	)
 
 	r := mux.NewRouter()
-
 	r.Handle("/dictionary/v1/health", svc.MakeHealthHandler(opts)).Methods("GET")
 	r.Handle("/dictionary/v1/random_word", randomWordHandler).Methods("GET")
 
