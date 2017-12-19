@@ -15,12 +15,18 @@ func EncodeResponse(_ context.Context, w http.ResponseWriter, resp interface{}) 
 }
 
 // Call a web service with the given url and parameters
-func Call(method, url string, payload io.Reader, res interface{}) error {
+func Call(method, url string, payload io.Reader, res interface{}, cookie []*http.Cookie) error {
 	req, err := http.NewRequest(method, url, payload)
 	if err != nil {
 		return err
 	}
 	req.Header.Add("Content-Type", "application/json")
+
+	if cookie != nil {
+		for _, c := range cookie {
+			req.AddCookie(c)
+		}
+	}
 
 	clt := http.DefaultClient
 	resp, err := clt.Do(req)

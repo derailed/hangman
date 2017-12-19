@@ -18,7 +18,7 @@ func svcURL(url, action string) string {
 func NewGame(URL string) (game.Game, hangman.Tally, error) {
 	var resp hangman.Response
 
-	err := svc.Call("POST", svcURL(URL, "new_game"), nil, &resp)
+	err := svc.Call("POST", svcURL(URL, "new_game"), nil, &resp, nil)
 	return resp.Game, resp.Tally, err
 }
 
@@ -31,6 +31,6 @@ func Guess(URL string, ga game.Game, letter string) (game.Game, hangman.Tally, e
 	if err != nil {
 		return res.Game, res.Tally, err
 	}
-	err = svc.Call("POST", svcURL(URL, "guess"), bytes.NewReader([]byte(payload)), &res)
+	err = svc.Call("POST", svcURL(URL, "guess"), bytes.NewReader([]byte(payload)), &res, nil)
 	return res.Game, res.Tally, err
 }

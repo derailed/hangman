@@ -21,7 +21,7 @@ func newGame(uri, word string) (game.Game, error) {
 	if err != nil {
 		return game.Game{}, err
 	}
-	err = svc.Call("POST", gameURL(uri, "new_game"), bytes.NewReader([]byte(payload)), &res)
+	err = svc.Call("POST", gameURL(uri, "new_game"), bytes.NewReader([]byte(payload)), &res, nil)
 	return res.Game, err
 }
 
@@ -33,6 +33,6 @@ func guess(uri string, g game.Game, letter string) (game.Game, error) {
 	if err != nil {
 		return res.Game, err
 	}
-	err = svc.Call("POST", gameURL(uri, "guess"), bytes.NewReader([]byte(payload)), &res)
+	err = svc.Call("POST", gameURL(uri, "guess"), bytes.NewReader([]byte(payload)), &res, nil)
 	return res.Game, err
 }

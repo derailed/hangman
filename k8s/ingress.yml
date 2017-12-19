@@ -16,3 +16,8 @@ spec:
         backend:
           serviceName: game
           servicePort: 9095
+      - path: /hangman/v1/.*
+        backend:
+          serviceName: hangman
+          servicePort: 9096
+

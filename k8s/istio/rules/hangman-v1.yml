@@ -3,14 +3,14 @@
 apiVersion: config.istio.io/v1alpha2
 kind:       RouteRule
 metadata:
-  name: game-v1
+  name: hangman-v1
 spec:
   precedence: 1
   destination:
     name: dictionary
   match:
     source:
-      name: game
+      name: hangman
   route:
   - labels:
       version: v1

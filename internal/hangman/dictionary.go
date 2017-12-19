@@ -13,8 +13,8 @@ func dicURL(url, path string) string {
 }
 
 // NewWord retrieves a random word from dictionary service
-func (s *service) NewWord(cookies []*http.Cookie) (string, error) {
+func (s *service) NewWord(c []*http.Cookie) (string, error) {
 	var res dictionary.WordResponse
-	err := svc.Call("GET", dicURL(s.dicURL, "random_word"), nil, &res)
+	err := svc.Call("GET", dicURL(s.dicURL, "random_word"), nil, &res, c)
 	return res.Word, err
 }
