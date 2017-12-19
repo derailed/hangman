@@ -3,8 +3,7 @@ apiVersion: v1
 metadata:
   name: game
   labels:
-    group: hangman
-    app:   game
+    app: game
 spec:
   selector:
     app: game

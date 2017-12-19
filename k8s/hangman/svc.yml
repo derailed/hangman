@@ -1,15 +1,14 @@
 kind:       Service
 apiVersion: v1
 metadata:
-  name: game
+  name: hangman
   labels:
-    group: hangman
-    app:   game
+    app: hangman
 spec:
   selector:
-    app: game
+    app: hangman
   ports:
     - name:       http
       protocol:   TCP
-      port:       9095
-      targetPort: 9095
+      port:       9096
+      targetPort: 9096

@@ -3,8 +3,7 @@ apiVersion: v1
 metadata:
   name: dictionary
   labels:
-    group: hangman
-    app:   dictionary
+    app: dictionary
 spec:
   selector:
     app: dictionary

@@ -3,14 +3,12 @@ apiVersion: extensions/v1beta1
 metadata:
   name: game-v1
   labels:
-    group: hangman
-    app:   game
+    app: game
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        group:   hangman
         app:     game
         version: v1
     spec:
@@ -18,9 +16,8 @@ spec:
       - name: quay-secret
       containers:
       - name:            game
-        image:           quay.io/derailed/hangman:1.1
+        image:           quay.io/derailed/game:1.2
         imagePullPolicy: IfNotPresent
-        args:            ["--url", "http://dictionary:9094"]
         resources:
           limits:
             cpu:    1.0m

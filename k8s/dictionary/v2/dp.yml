@@ -3,14 +3,12 @@ apiVersion: extensions/v1beta1
 metadata:
   name: dictionary-v2
   labels:
-    group: hangman
-    app:   dictionary
+    app: dictionary
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        group:   hangman
         app:     dictionary
         version: v2
     spec:
@@ -18,7 +16,7 @@ spec:
       - name: quay-secret
       containers:
       - name:            dictionary
-        image:           quay.io/derailed/dictionary:1.1
+        image:           quay.io/derailed/dictionary:1.2
         imagePullPolicy: IfNotPresent
         args:            ["--dic", "trump"]
         resources:
