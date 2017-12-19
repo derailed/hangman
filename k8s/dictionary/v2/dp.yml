@@ -21,16 +21,10 @@ spec:
         image:           quay.io/derailed/dictionary:1.1
         imagePullPolicy: IfNotPresent
         args:            ["--dic", "trump"]
-        # livenessProbe:
-        #   httpGet:
-        #     path: /dictionary/v1/health
-        #     port: 9094
-        #   initialDelaySeconds: 15
-        #   timeoutSeconds:      15
         resources:
           limits:
-            cpu:    0.5m
-            memory: 4Mi
+            cpu:    1.0m
+            memory: 5Mi
         ports:
         - name:          api
           containerPort: 9090

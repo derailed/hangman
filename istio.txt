@@ -46,21 +46,20 @@ ku create \
 ## Forwards
 
 kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=grafana -o jsonpath='{.items[0].metadata.name}') 3000:3000 &
-http://localhost:3000/dashboard/db/istio-dashboard
-
 kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=servicegraph -o jsonpath='{.items[0].metadata.name}') 3001:8088 &
+kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=prometheus -o jsonpath='{.items[0].metadata.name}') 3002:9090 &
+kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=zipkin -o jsonpath='{.items[0].metadata.name}') 3003:9411 &
+
+http://localhost:3000/dashboard/db/istio-dashboard
 http://localhost:3001/dotviz
 http://localhost:3001/graph
-
-kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=prometheus -o jsonpath='{.items[0].metadata.name}') 3002:9090 &
 http://localhost:3002/graph
-
-kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=zipkin -o jsonpath='{.items[0].metadata.name}') 3003:9411 &
 http://localhost:3003
 
 ## Hangman
 
 ku create \
+  -f k8s/istio/telemetry.yml \
   -f k8s/quay.yml \
   -f k8s/dictionary/v1 \
   -f k8s/game \
@@ -83,3 +82,9 @@ ku create -f k8s/istio/all.yml
 
 istioctl delete routerule dictionary-v2-all -n default
 istioctl get routerule dic-80 -o yaml
+
+
+round(
+  sum(
+    irate(
+      istio_request_count{source_service=~"$source",source_version=~"$source_version",destination_service=~"$http_destination",destination_version=~"$destination_version"}[1m])), 0.001)

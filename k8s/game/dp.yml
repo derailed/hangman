@@ -18,19 +18,13 @@ spec:
       - name: quay-secret
       containers:
       - name:            game
-        image:           quay.io/derailed/hangman:1.0
+        image:           quay.io/derailed/hangman:1.1
         imagePullPolicy: IfNotPresent
         args:            ["--url", "http://dictionary:9094"]
-        livenessProbe:
-          httpGet:
-            path: /game/v1/health
-            port: 9095
-          initialDelaySeconds: 15
-          timeoutSeconds:      15
         resources:
           limits:
-            cpu:    0.5m
-            memory: 4Mi
+            cpu:    1.0m
+            memory: 5Mi
         ports:
         - name:          http
           containerPort: 9095

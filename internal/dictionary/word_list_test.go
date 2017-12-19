@@ -11,7 +11,7 @@ func TestCreateGoodFile(t *testing.T) {
 	wl, err := dictionary.InitWordList()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 8881, len(wl))
+	assert.Equal(t, 5, len(wl))
 }
 
 func TestCreateBadFile(t *testing.T) {

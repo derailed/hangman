@@ -1,9 +1,9 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
+	"net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,21 +15,23 @@ import (
 
 const port = ":9095"
 
-const localDic = "http://localhost:9094"
-
 func main() {
-	dicUrl := flag.String("url", localDic, "Dictionary Host URL")
-
-	flag.Parse()
-
 	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
-	svc := game.NewService(*dicUrl)
+	svc := game.NewService()
 	svc = game.NewLoggingService(svc, logger)
 
 	mux := http.NewServeMux()
 	mux.Handle("/game/v1/", game.MakeHandler(svc, logger))
+
+	// Register pprof handlers
+	mux.HandleFunc("/debug/pprof/", pprof.Index)
+	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+
 	http.Handle("/", cors.AccessControl(mux))
 
 	errs := make(chan error, 2)

@@ -39,19 +39,19 @@ type (
 )
 
 // NewGame of hangman
-func NewGame(word string) (*Game, Tally) {
+func NewGame(word string) (Game, Tally) {
 	// Need to talk to word list and get rand word
 	g := Game{Status: Started, TurnsLeft: 7, Letters: word, Guesses: []rune{}}
 
 	return g.returnWithTally()
 }
 
-func (g *Game) returnWithTally() (*Game, Tally) {
-	return g, g.tallyFromGame()
+func (g *Game) returnWithTally() (Game, Tally) {
+	return *g, g.tallyFromGame()
 }
 
 // Guess a letter in the selected word
-func (g *Game) Guess(l rune) (*Game, Tally) {
+func (g *Game) Guess(l rune) (Game, Tally) {
 	if g.alreadyGuessed(l) {
 		g.Status = Guessed
 		return g.returnWithTally()

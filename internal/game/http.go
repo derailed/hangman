@@ -3,7 +3,6 @@ package game
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -16,43 +15,50 @@ import (
 const dictionary_url = "http://localhost:9090/dictionary/v1/random_word"
 
 type (
-	newRequest struct {
-		Word string `json:"word"`
+	NewGameRequest struct {
+		Word    string         `json:"word"`
+		Cookies []*http.Cookie `json:"cookies"`
 	}
 
-	newResponse struct {
-		Game  *Game `json:"game"`
+	NewGameResponse struct {
+		Game  Game  `json:"game"`
 		Tally Tally `json:"tally"`
 	}
 
-	pingRequest struct {
+	healthRequest struct {
 	}
 
-	pingResponse struct {
+	HealthResponse struct {
 		Status string `json:"status"`
 	}
 
-	guessRequest struct {
-		Game  *Game  `json:"game"`
+	GuessRequest struct {
+		Game  Game   `json:"game"`
 		Guess string `json:"guess"`
 	}
 
-	guessResponse struct {
-		Game  *Game `json:"game"`
+	GuessResponse struct {
+		Game  Game  `json:"game"`
 		Tally Tally `json:"tally"`
 	}
 )
 
-func decodeNewRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	return nil, nil
+func decodeNewGameRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req NewGameRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	req.Cookies = r.Cookies()
+
+	return req, nil
 }
 
-func decodePingRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	return nil, nil
+func decodeHealthRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	return healthRequest{}, nil
 }
 
 func decodeGuessRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req guessRequest
+	var req GuessRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
@@ -61,31 +67,29 @@ func decodeGuessRequest(_ context.Context, r *http.Request) (interface{}, error)
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	w.Header().Add("Content-Type", "application/json")
 	return json.NewEncoder(w).Encode(response)
 }
 
-func makePingEndPoint(svc Service) endpoint.Endpoint {
+func makeHealthEndPoint(svc Service) endpoint.Endpoint {
 	return func(_ context.Context, _ interface{}) (interface{}, error) {
-		return pingResponse{Status: "ok"}, nil
+		return HealthResponse{Status: "ok"}, nil
 	}
 }
 
-func makeNewEndPoint(svc Service) endpoint.Endpoint {
-	return func(_ context.Context, _ interface{}) (interface{}, error) {
-		word, err := getWord(svc.DictionaryURL())
-		if err != nil {
-			return nil, err
-		}
-		game, tally := svc.NewGame(word)
-		return newResponse{Game: game, Tally: tally}, nil
+func makeNewGameEndPoint(svc Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(NewGameRequest)
+		game, tally := svc.NewGame(req.Word)
+		return NewGameResponse{Game: game, Tally: tally}, nil
 	}
 }
 
 func makeGuessEndPoint(svc Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(guessRequest)
+		req := request.(GuessRequest)
 		game, tally := svc.Guess(req.Game, req.Guess)
-		return guessResponse{Game: game, Tally: tally}, nil
+		return GuessResponse{Game: game, Tally: tally}, nil
 	}
 }
 
@@ -96,15 +100,15 @@ func MakeHandler(svc Service, logger kitlog.Logger) http.Handler {
 	}
 
 	pingHandler := kithttp.NewServer(
-		makePingEndPoint(svc),
-		decodePingRequest,
+		makeHealthEndPoint(svc),
+		decodeHealthRequest,
 		encodeResponse,
 		opts...,
 	)
 
-	newHandler := kithttp.NewServer(
-		makeNewEndPoint(svc),
-		decodeNewRequest,
+	newGameHandler := kithttp.NewServer(
+		makeNewGameEndPoint(svc),
+		decodeNewGameRequest,
 		encodeResponse,
 		opts...,
 	)
@@ -119,34 +123,8 @@ func MakeHandler(svc Service, logger kitlog.Logger) http.Handler {
 	r := mux.NewRouter()
 
 	r.Handle("/game/v1/health", pingHandler)
-	r.Handle("/game/v1/new_game", newHandler)
+	r.Handle("/game/v1/new_game", newGameHandler).Methods("POST")
 	r.Handle("/game/v1/guess", guessHandler).Methods("POST")
 
 	return r
-}
-
-func getWord(url string) (string, error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Add("Content-Type", "application/json")
-
-	clt := http.DefaultClient
-	resp, err := clt.Do(req)
-	if err != nil {
-		return "", err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return "", errors.New("dictionary toast")
-	}
-
-	res := map[string]interface{}{}
-
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return "", err
-	}
-	return res["word"].(string), nil
 }

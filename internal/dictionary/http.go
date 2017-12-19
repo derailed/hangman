@@ -2,9 +2,9 @@ package dictionary
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
+	"github.com/derailed/hangman2/internal/svc"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/gorilla/mux"
 
@@ -12,63 +12,36 @@ import (
 	kithttp "github.com/go-kit/kit/transport/http"
 )
 
-type (
-	randomWordResponse struct {
-		Word string `json:"word"`
-	}
-
-	pingResponse struct {
-		Status string `json:"status"`
-	}
-)
+type RandomWordResponse struct {
+	Word string `json:"word"`
+}
 
 func decodeRandomWordRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	return "", nil
 }
 
-func decodePingRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	return "", nil
-}
-
-func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	return json.NewEncoder(w).Encode(response)
-}
-
 func makeRandomWordEndPoint(svc Service) endpoint.Endpoint {
 	return func(_ context.Context, _ interface{}) (interface{}, error) {
-		return randomWordResponse{Word: svc.Word()}, nil
-	}
-}
-
-func makePingEndPoint(svc Service) endpoint.Endpoint {
-	return func(_ context.Context, _ interface{}) (interface{}, error) {
-		return pingResponse{Status: "ok"}, nil
+		return RandomWordResponse{Word: svc.Word()}, nil
 	}
 }
 
 // MakeHandler to service route requests
-func MakeHandler(svc Service, logger kitlog.Logger) http.Handler {
+func MakeHandler(s Service, l kitlog.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
-		kithttp.ServerErrorLogger(logger),
+		kithttp.ServerErrorLogger(l),
 	}
 
 	randomWordHandler := kithttp.NewServer(
-		makeRandomWordEndPoint(svc),
+		makeRandomWordEndPoint(s),
 		decodeRandomWordRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	pingHandler := kithttp.NewServer(
-		makePingEndPoint(svc),
-		decodePingRequest,
-		encodeResponse,
+		svc.EncodeResponse,
 		opts...,
 	)
 
 	r := mux.NewRouter()
 
-	r.Handle("/dictionary/v1/health", pingHandler).Methods("GET")
+	r.Handle("/dictionary/v1/health", svc.MakeHealthHandler(opts)).Methods("GET")
 	r.Handle("/dictionary/v1/random_word", randomWordHandler).Methods("GET")
 
 	return r

@@ -1,0 +1,18 @@
+apiVersion: config.istio.io/v1alpha2
+kind:       RouteRule
+metadata:
+  name:      header
+  namespace: default
+spec:
+  precedence: 2
+  destination:
+    name: dictionary
+  match:
+    request:
+      headers:
+        cookie:
+          regex: "^(.*?;)?(user=blee)(;.*)?$"
+  route:
+    - labels:
+        version: v2
+      weight: 100

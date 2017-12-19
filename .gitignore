@@ -1,3 +1,11 @@
 vendor
 notes.txt
 k8s/quay.yml
+pprof.txt
+scenarios.txt
+watch
+loop.sh
+start.sh
+gke.txt
+.envrc
+istio.txt

@@ -1,0 +1,17 @@
+# ---
+# Game all
+apiVersion: config.istio.io/v1alpha2
+kind:       RouteRule
+metadata:
+  name: game-v1
+spec:
+  precedence: 1
+  destination:
+    name: dictionary
+  match:
+    source:
+      name: game
+  route:
+  - labels:
+      version: v1
+    weight: 100

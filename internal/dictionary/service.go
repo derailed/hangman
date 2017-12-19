@@ -11,8 +11,8 @@ type (
 	}
 )
 
-// New dictionary service
-func New(path string) (Service, error) {
+// NewService creates a new dictionary service
+func NewService(path string) (Service, error) {
 	list, err := NewWordList(path)
 	if err != nil {
 		return service{}, err

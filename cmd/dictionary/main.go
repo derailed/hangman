@@ -25,7 +25,7 @@ func main() {
 
 	logger.Log("dictionary", *dic)
 
-	svc, err := dictionary.New(fmt.Sprintf("assets/%s.txt", *dic))
+	svc, err := dictionary.NewService(fmt.Sprintf("assets/%s.txt", *dic))
 	if err != nil {
 		panic(err)
 	}

@@ -1,0 +1,16 @@
+apiVersion: config.istio.io/v1alpha2
+kind:       RouteRule
+metadata:
+  name: dic-retry
+spec:
+  precedence: 2
+  destination:
+    name: dictionary
+  route:
+  - labels:
+      version: v1
+    weight: 100
+  httpReqRetries:
+    simpleRetry:
+      attempts:      3
+      perTryTimeout: 2s
