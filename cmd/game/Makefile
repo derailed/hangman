@@ -1,5 +1,5 @@
-VERSION  := 1.1
-NAME     := hangman
+VERSION  := 1.2
+NAME     := game
 BUILD    := $(shell cat /tmp/build)
 
 help:
