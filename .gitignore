@@ -9,3 +9,4 @@ start.sh
 gke.txt
 .envrc
 istio.txt
+coverage.cov
