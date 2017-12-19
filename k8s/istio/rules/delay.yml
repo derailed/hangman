@@ -1,0 +1,15 @@
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: dic-delay
+spec:
+  precedence: 5
+  destination:
+    name: dictionary
+  route:
+  - labels:
+      version: v1
+  httpFault:
+    delay:
+      percent: 100
+      fixedDelay: 10s

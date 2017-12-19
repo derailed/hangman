@@ -12,7 +12,7 @@ spec:
     request:
       headers:
         cookie:
-          regex: "^(.*?;)?(user=blee)(;.*)?$"
+          regex: "^(.*?;)?(dic=trump)(;.*)?$"
   route:
     - labels:
         version: v2
