@@ -1,9 +1,5 @@
 package game
 
-import (
-	"strings"
-)
-
 const (
 	// Won indicates the game ended with a win
 	Won = iota
@@ -77,18 +73,6 @@ func (g *Game) isWon() bool {
 		}
 	}
 	return true
-}
-
-func (g *Game) obfuscate() string {
-	res := make([]string, len(g.Letters))
-	for i, c := range g.Letters {
-		if g.alreadyGuessed(c) {
-			res[i] = string(c)
-		} else {
-			res[i] = "_"
-		}
-	}
-	return strings.Join(res, " ")
 }
 
 func (g *Game) alreadyGuessed(l rune) bool {

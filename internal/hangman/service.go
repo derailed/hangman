@@ -1,9 +1,7 @@
 package hangman
 
 import (
-	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/derailed/hangman2/internal/game"
 )
@@ -11,15 +9,12 @@ import (
 type (
 	// Service represent a hangman game interaction
 	Service interface {
-		NewGame([]*http.Cookie) (int, game.Tally, error)
-		Guess(string, string) (game.Tally, error)
-		EndGame(string) error
+		NewGame([]*http.Cookie) (game.Game, Tally, error)
+		Guess(game.Game, string) (game.Game, Tally, error)
 	}
 
 	service struct {
 		dicURL, gameURL string
-		id              int
-		games           map[int]game.Game
 	}
 )
 
@@ -28,56 +23,32 @@ func NewService(dicURL, gameURL string) Service {
 	return &service{
 		dicURL:  dicURL,
 		gameURL: gameURL,
-		games:   make(map[int]game.Game),
 	}
+}
+
+func withTally(g game.Game) (game.Game, Tally, error) {
+	return g, tallyFromGame(g), nil
 }
 
 // NewGame starts a new hangman game
-func (s *service) NewGame(cookies []*http.Cookie) (int, game.Tally, error) {
+func (s *service) NewGame(cookies []*http.Cookie) (game.Game, Tally, error) {
 	word, err := s.NewWord(cookies)
 	if err != nil {
-		return 0, game.Tally{}, err
+		return game.Game{}, Tally{}, err
 	}
-	fmt.Println("WORD", word)
-	g, tally, err := newGame(s.gameURL, word)
+	g, err := newGame(s.gameURL, word)
 	if err != nil {
-		return 0, game.Tally{}, err
+		return g, Tally{}, err
 	}
-	id := s.nextID()
-	s.games[id] = g
 
-	return id, tally, nil
+	return withTally(g)
 }
 
 // Guess a letter
-func (s *service) Guess(id string, letter string) (game.Tally, error) {
-	index, err := strconv.Atoi(id)
+func (s *service) Guess(g game.Game, letter string) (game.Game, Tally, error) {
+	ng, err := guess(s.gameURL, g, letter)
 	if err != nil {
-		return game.Tally{}, err
+		return ng, Tally{}, err
 	}
-	g, ok := s.games[index]
-	if !ok {
-		return game.Tally{}, fmt.Errorf("Unable to find game id `%d", index)
-	}
-	game, tally, err := guess(s.gameURL, g, letter)
-	if err != nil {
-		return tally, err
-	}
-	s.games[index] = game
-	return tally, err
-}
-
-func (s *service) EndGame(id string) error {
-	index, err := strconv.Atoi(id)
-	if err != nil {
-		return err
-	}
-
-	delete(s.games, index)
-	return nil
-}
-
-func (s *service) nextID() int {
-	s.id++
-	return s.id
+	return withTally(ng)
 }

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strconv"
 
 	"github.com/derailed/hangman2/internal/game"
 	"github.com/derailed/hangman2/internal/hangman"
@@ -15,36 +14,23 @@ func svcURL(url, action string) string {
 	return fmt.Sprintf("http://%s/hangman/v1/%s", url, action)
 }
 
-func NewGame(URL string) (int, game.Tally, error) {
-	var resp hangman.NewGameResponse
+// NewGame starts a new game
+func NewGame(URL string) (game.Game, hangman.Tally, error) {
+	var resp hangman.Response
 
 	err := svc.Call("POST", svcURL(URL, "new_game"), nil, &resp)
-	return resp.ID, resp.Tally, err
+	return resp.Game, resp.Tally, err
 }
 
-func EndGame(URL string, id int) error {
-	var res hangman.EndGameResponse
-	index := strconv.Itoa(id)
+// Guess a letter
+func Guess(URL string, ga game.Game, letter string) (game.Game, hangman.Tally, error) {
+	var res hangman.Response
 
-	req := hangman.EndGameRequest{ID: index}
+	req := game.GuessRequest{Game: ga, Guess: letter}
 	payload, err := json.Marshal(req)
 	if err != nil {
-		return err
-	}
-	return svc.Call("POST", svcURL(URL, "end_game"), bytes.NewReader([]byte(payload)), &res)
-}
-
-func Guess(URL string, id int, letter string) (game.Tally, error) {
-	var res game.GuessResponse
-
-	index := strconv.Itoa(id)
-	fmt.Println("ID", index)
-
-	req := hangman.GuessRequest{ID: index, Guess: letter}
-	payload, err := json.Marshal(req)
-	if err != nil {
-		return res.Tally, err
+		return res.Game, res.Tally, err
 	}
 	err = svc.Call("POST", svcURL(URL, "guess"), bytes.NewReader([]byte(payload)), &res)
-	return res.Tally, err
+	return res.Game, res.Tally, err
 }

@@ -43,7 +43,7 @@ func decodeNewGameRequest(_ context.Context, r *http.Request) (interface{}, erro
 	return req, nil
 }
 
-func decodeGuessRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func DecodeGuessRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req GuessRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -83,7 +83,7 @@ func MakeHandler(s Service, l kitlog.Logger) http.Handler {
 
 	guessHandler := kithttp.NewServer(
 		makeGuessEndPoint(s),
-		decodeGuessRequest,
+		DecodeGuessRequest,
 		svc.EncodeResponse,
 		opts...,
 	)

@@ -19,7 +19,7 @@ func NewLoggingService(s Service, l log.Logger) Service {
 }
 
 // NewGame logging wrapper
-func (mw loggingService) NewGame(cookies []*http.Cookie) (int, game.Tally, error) {
+func (mw loggingService) NewGame(cookies []*http.Cookie) (game.Game, Tally, error) {
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "new_game",
@@ -31,27 +31,14 @@ func (mw loggingService) NewGame(cookies []*http.Cookie) (int, game.Tally, error
 }
 
 // Guess logging wrapper
-func (mw loggingService) Guess(id string, letter string) (game.Tally, error) {
+func (mw loggingService) Guess(g game.Game, l string) (game.Game, Tally, error) {
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "guess",
-			"game_id", id,
-			"input", letter,
+			"input", l,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
 
-	return mw.Service.Guess(id, letter)
-}
-
-func (mw loggingService) EndGame(id string) error {
-	defer func(begin time.Time) {
-		_ = mw.logger.Log(
-			"method", "end_game",
-			"game_id", id,
-			"took", time.Since(begin),
-		)
-	}(time.Now())
-
-	return mw.Service.EndGame(id)
+	return mw.Service.Guess(g, l)
 }

@@ -10,12 +10,8 @@ import (
 
 	"github.com/derailed/hangman2/internal/cli"
 	"github.com/derailed/hangman2/internal/game"
+	"github.com/derailed/hangman2/internal/hangman"
 )
-
-type result struct {
-	Game  *game.Game  `json:"game"`
-	Tally *game.Tally `json:"tally"`
-}
 
 func main() {
 	svcURL := flag.String("url", "localhost:9096", "Hangman service url")
@@ -31,30 +27,28 @@ func main() {
 		os.Exit(0)
 	}()
 
-	id, tally, err := cli.NewGame(*svcURL)
+	ga, tally, err := cli.NewGame(*svcURL)
 	if err != nil {
 		panic(err)
 	}
 
 	for {
 		cli.Display(tally)
-		tally, err = cli.Guess(*svcURL, id, prompt())
+		ga, tally, err = cli.Guess(*svcURL, ga, prompt())
 		if err != nil {
 			panic(err)
 		}
-		allDone(*svcURL, id, tally)
+		allDone(*svcURL, ga, tally)
 	}
 }
 
-func allDone(url string, id int, t game.Tally) {
+func allDone(url string, ga game.Game, t hangman.Tally) {
 	if t.Status == game.Won {
 		fmt.Println("Noace! You've won!!")
-		cli.EndGame(url, id)
 		os.Exit(0)
 	}
 	if t.Status == game.Lost {
-		fmt.Printf("Rats! You've just lost...\n")
-		cli.EndGame(url, id)
+		fmt.Printf("Rats! You've just lost... It was %s\n", ga.Letters)
 		os.Exit(0)
 	}
 }

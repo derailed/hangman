@@ -4,9 +4,11 @@ import (
 	"fmt"
 
 	"github.com/derailed/hangman2/internal/game"
+	"github.com/derailed/hangman2/internal/hangman"
 )
 
-func Display(tally game.Tally) {
+// Display the current game state
+func Display(tally hangman.Tally) {
 	fmt.Printf("\n%10s: %s\n", "Letters", tally.Letters)
 	fmt.Printf("%10s: %s [%d]\n", "Status", statusToH(tally.Status), tally.TurnsLeft)
 }
