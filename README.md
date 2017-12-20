@@ -5,17 +5,21 @@
 This is an implementation of the traditional game of Hangman. This application
 is broken into 3 separate web services:
 
-* Dictionary Service
-* Game Service
-* Hangman Service
+* Dictionary
+* Game
+* Hangman
 
-This application is driven via a cli which connects to the Hangman service and
+This application is driven via a CLI which connects to the Hangman service and
 tracks game progress and status.
 
 This demo application is deployed via Kubernetes and leverages an [Istio](http://istio.io)
 service mesh to orchestrate the cluster and manage inter-service communication by
 dialing various knobs.
 
+The CLI connects to the Hangman service to start new games and issue guesses. The game
+service tracks the game state as a user takes turn to guess a word. Words are provided by
+the dictionary service which loads a collection of words from disk and selects random
+words to guess.
 
 ---
 <img src="assets/imhotep_logo.png" width="32" height="auto"/> © 2018 Imhotep Software LLC.
