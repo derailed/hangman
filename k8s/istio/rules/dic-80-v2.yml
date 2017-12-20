@@ -1,0 +1,16 @@
+# Must use if you want dic to route 100% to v1
+apiVersion: config.istio.io/v1alpha2
+kind:       RouteRule
+metadata:
+  name: dic-80-v2
+spec:
+  precedence: 2
+  destination:
+    name: dictionary
+  route:
+  - labels:
+      version: v1
+    weight: 20
+  - labels:
+      version: v2
+    weight: 80

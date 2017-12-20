@@ -1,5 +1,4 @@
-# ---
-# Game all
+# Direct all hangman traffic to dic v1
 apiVersion: config.istio.io/v1alpha2
 kind:       RouteRule
 metadata:

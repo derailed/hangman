@@ -1,3 +1,4 @@
+# Must use if you want dic to route 100% to v1
 apiVersion: config.istio.io/v1alpha2
 kind:       RouteRule
 metadata:

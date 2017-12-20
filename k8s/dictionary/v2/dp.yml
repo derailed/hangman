@@ -20,9 +20,12 @@ spec:
         imagePullPolicy: IfNotPresent
         args:            ["--dic", "trump"]
         resources:
+          requests:
+            cpu:    250m
+            memory: 32Mi
           limits:
-            cpu:    1.0m
-            memory: 5Mi
+            cpu:    500m
+            memory: 64Mi
         ports:
         - name:          api
           containerPort: 9090

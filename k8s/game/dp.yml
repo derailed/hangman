@@ -19,9 +19,12 @@ spec:
         image:           quay.io/derailed/game:1.2
         imagePullPolicy: IfNotPresent
         resources:
+          requests:
+            cpu:    250m
+            memory: 32Mi
           limits:
-            cpu:    1.0m
-            memory: 5Mi
+            cpu:    500m
+            memory: 64Mi
         ports:
         - name:          http
           containerPort: 9095

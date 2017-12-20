@@ -3,7 +3,7 @@ apiVersion: extensions/v1beta1
 metadata:
   name: hangman-v1
   labels:
-    app:   hangman
+    app:     hangman
 spec:
   replicas: 1
   template:
@@ -20,9 +20,12 @@ spec:
         imagePullPolicy: IfNotPresent
         args:            ["--dicUrl", "http://dictionary:9094", "--gameUrl", "http://game:9095"]
         resources:
+          requests:
+            cpu:    250m
+            memory: 32Mi
           limits:
-            cpu:    1.0m
-            memory: 5Mi
+            cpu:    500m
+            memory: 64Mi
         ports:
         - name:          http
           containerPort: 9096

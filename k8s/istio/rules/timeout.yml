@@ -1,3 +1,18 @@
+apiVersion: config.istio.io/v1alpha2
+kind:       RouteRule
+metadata:
+  name: dic-delay
+spec:
+  precedence: 2
+  destination:
+    name: dictionary
+  match:
+    source:
+      name: hangman
+  httpFault:
+    delay:
+      percent: 100
+      fixedDelay: 2s
 ---
 apiVersion: config.istio.io/v1alpha2
 kind:       RouteRule
@@ -7,9 +22,13 @@ spec:
   precedence: 2
   destination:
     name: dictionary
+  match:
+    source:
+      name: hangman
   route:
   - labels:
       version: v1
+    weight: 100
   httpReqTimeout:
     simpleTimeout:
-      timeout: 10s
+      timeout: 1s

@@ -1,4 +1,0 @@
-rules:
-  - apects:
-    - kind: denials
-    selector: source.labels["app"]=="game"
