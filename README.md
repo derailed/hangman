@@ -5,14 +5,14 @@
 This is an implementation of the traditional game of Hangman. This application
 is broken into 3 separate web services:
 
-* Dictionary Service which produces random word generation
-* Game Service which tracks the game state
+* Dictionary Service
+* Game Service
 * Hangman Service
 
-This application is driven via a cli which connects to the Hangman service which
+This application is driven via a cli which connects to the Hangman service and
 tracks game progress and status.
 
-This demo application is deployed via Kubernetes and leverage an Istio
+This demo application is deployed via Kubernetes and leverages an [Istio](http://istio.io)
 service mesh to orchestrate the cluster and manage inter-service communication by
 dialing various knobs.
 
