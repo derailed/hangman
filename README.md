@@ -12,9 +12,9 @@ is broken into 3 separate web services:
 This application is driven via a CLI which connects to the Hangman service and
 tracks game progress and status.
 
-This demo application is deployed via Kubernetes and leverages an [Istio](http://istio.io)
-service mesh to orchestrate the cluster and manage inter-service communication by
-dialing various knobs.
+The demo is deployed via Kubernetes and leverages an [Istio](http://istio.io)
+service mesh to orchestrate the cluster. Inter-service communication can be dialed
+in by injecting envoys policies in the cluster.
 
 The CLI connects to the Hangman service to start new games and issue guesses. The game
 service tracks the game state as a user takes turn to guess a word. Words are provided by
