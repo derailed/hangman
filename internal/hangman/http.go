@@ -18,7 +18,8 @@ type (
 	NewGameRequest struct {
 		Cookies []*http.Cookie `json:"cookies"`
 	}
-	// NewGameResponse returns a new game and tally
+
+	// Response returns a new game and tally
 	Response struct {
 		Game  game.Game `json:"game"`
 		Tally Tally     `json:"tally"`

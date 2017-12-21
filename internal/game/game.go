@@ -35,13 +35,12 @@ type (
 
 // NewGame starts a hangman game
 func NewGame(word string) *Game {
-	g := Game{Status: Started, TurnsLeft: 7, Letters: word, Guesses: []rune{}}
-	return &g
+	return &Game{Status: Started, TurnsLeft: 7, Letters: word, Guesses: []rune{}}
 }
 
 // Guess a letter in the selected word
 func (g *Game) Guess(l rune) *Game {
-	if g.alreadyGuessed(l) {
+	if g.AlreadyGuessed(l) {
 		g.Status = Guessed
 		return g
 	}
@@ -66,22 +65,23 @@ func (g *Game) Guess(l rune) *Game {
 	return g
 }
 
-func (g *Game) isWon() bool {
-	for _, c := range g.Letters {
-		if !g.alreadyGuessed(c) {
-			return false
-		}
-	}
-	return true
-}
-
-func (g *Game) alreadyGuessed(l rune) bool {
+// AlreadyGuessed checks if the given letter has been guessed
+func (g *Game) AlreadyGuessed(l rune) bool {
 	for _, c := range g.Guesses {
 		if c == l {
 			return true
 		}
 	}
 	return false
+}
+
+func (g *Game) isWon() bool {
+	for _, c := range g.Letters {
+		if !g.AlreadyGuessed(c) {
+			return false
+		}
+	}
+	return true
 }
 
 func (g *Game) inWord(l rune) bool {

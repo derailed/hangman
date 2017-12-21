@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/derailed/hangman/internal/game"
+	"github.com/pkg/errors"
 )
 
 type (
@@ -34,11 +35,11 @@ func withTally(g game.Game) (game.Game, Tally, error) {
 func (s *service) NewGame(cookies []*http.Cookie) (game.Game, Tally, error) {
 	word, err := s.NewWord(cookies)
 	if err != nil {
-		return game.Game{}, Tally{}, err
+		return game.Game{}, Tally{}, errors.Wrap(err, "dictionary svc new_word crapped out!")
 	}
 	g, err := newGame(s.gameURL, word)
 	if err != nil {
-		return g, Tally{}, err
+		return g, Tally{}, errors.Wrap(err, "game svc new_game crapped out!")
 	}
 
 	return withTally(g)
@@ -48,7 +49,7 @@ func (s *service) NewGame(cookies []*http.Cookie) (game.Game, Tally, error) {
 func (s *service) Guess(g game.Game, letter string) (game.Game, Tally, error) {
 	ng, err := guess(s.gameURL, g, letter)
 	if err != nil {
-		return ng, Tally{}, err
+		return ng, Tally{}, errors.Wrap(err, "game svc guess crapped out!")
 	}
 	return withTally(ng)
 }

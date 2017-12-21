@@ -3,7 +3,7 @@ kind: RouteRule
 metadata:
   name: dic-delay
 spec:
-  precedence: 5
+  precedence: 3
   destination:
     name: dictionary
   route:
@@ -11,5 +11,5 @@ spec:
       version: v1
   httpFault:
     delay:
-      percent: 100
+      percent:    100
       fixedDelay: 10s

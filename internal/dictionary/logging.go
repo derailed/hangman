@@ -17,7 +17,7 @@ func NewLoggingService(s Randomizer, l log.Logger) Randomizer {
 }
 
 // NewGame logging wrapper
-func (mw loggingService) Word() (word string) {
+func (mw *loggingService) Word() (word string) {
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "word",

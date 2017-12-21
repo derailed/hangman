@@ -17,7 +17,7 @@ func NewLoggingService(s Service, l log.Logger) Service {
 }
 
 // NewGame logging wrapper
-func (mw loggingService) NewGame(word string) Game {
+func (mw *loggingService) NewGame(word string) Game {
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "newGame",
@@ -29,7 +29,7 @@ func (mw loggingService) NewGame(word string) Game {
 }
 
 // Guess logging wrapper
-func (mw loggingService) Guess(g Game, l rune) Game {
+func (mw *loggingService) Guess(g Game, l rune) Game {
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "guess",

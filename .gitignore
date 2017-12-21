@@ -12,3 +12,5 @@ istio.txt
 coverage.cov
 game.json
 execs
+hang-loop.sh
+dic-loop.sh

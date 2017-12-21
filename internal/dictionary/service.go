@@ -1,5 +1,7 @@
 package dictionary
 
+import "github.com/pkg/errors"
+
 type service struct {
 	list WordList
 }
@@ -8,12 +10,12 @@ type service struct {
 func NewService(path string) (Randomizer, error) {
 	list, err := NewWordList(path)
 	if err != nil {
-		return service{}, err
+		return &service{}, errors.Wrap(err, "no word list file found!")
 	}
-	return service{list: list}, nil
+	return &service{list: list}, nil
 }
 
 // NewWord fetches a new random word for the words list
-func (s service) Word() string {
+func (s *service) Word() string {
 	return s.list.Word()
 }

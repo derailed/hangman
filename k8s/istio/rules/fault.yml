@@ -11,5 +11,5 @@ spec:
       name: hangman
   httpFault:
     abort:
-      percent: 50
+      percent:    50
       httpStatus: 400

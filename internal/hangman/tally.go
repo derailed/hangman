@@ -17,27 +17,18 @@ func tallyFromGame(g game.Game) Tally {
 	return Tally{
 		Status:    g.Status,
 		TurnsLeft: g.TurnsLeft,
-		Letters:   obfuscate(g.Letters, g.Guesses),
+		Letters:   obfuscate(g),
 	}
 }
 
-func obfuscate(letters string, guesses []rune) string {
-	res := make([]string, len(letters))
-	for i, c := range letters {
-		if alreadyGuessed(guesses, c) {
+func obfuscate(g game.Game) string {
+	res := make([]string, len(g.Letters))
+	for i, c := range g.Letters {
+		if g.AlreadyGuessed(c) {
 			res[i] = string(c)
 		} else {
 			res[i] = "_"
 		}
 	}
 	return strings.Join(res, " ")
-}
-
-func alreadyGuessed(guesses []rune, l rune) bool {
-	for _, c := range guesses {
-		if c == l {
-			return true
-		}
-	}
-	return false
 }

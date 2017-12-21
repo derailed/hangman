@@ -18,7 +18,7 @@ kind: rule
 metadata:
   name: denyreviewsv3
 spec:
-  match: destination.labels["app"] == "dictionary" && source.labels["app"]=="game" && source.labels["version"] == "v1"
+  match: destination.labels["app"] == "dictionary" && source.labels["app"]=="hangman" && source.labels["version"] == "v1"
   actions:
   - handler: denyreviewsv3handler.denier
     instances: [ denyreviewsv3request.checknothing ]

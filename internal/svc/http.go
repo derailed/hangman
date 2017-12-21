@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/pkg/errors"
 )
 
 // EncodeResponse returns a json reply
@@ -31,7 +33,7 @@ func Call(method, url string, payload io.Reader, res interface{}, cookie []*http
 	clt := http.DefaultClient
 	resp, err := clt.Do(req)
 	if err != nil {
-		return err
+		return errors.Wrap(err, fmt.Sprintf("remote call %s crapped out!", url))
 	}
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("doh!! %s failed", url)
