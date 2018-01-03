@@ -1,7 +1,7 @@
 <img src="assets/gallows.png" align="right" width="100" height="auto"/>
 
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/derailed/hangman)](https://goreportcard.com/badge/github.com/derailed/hangman)
+[![Go Report Card](https://goreportcard.com/badge/github.com/derailed/hangman)](https://goreportcard.com/report/github.com/derailed/hangman)
 
 # Hangman Istio Style
 
