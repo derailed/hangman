@@ -13,7 +13,7 @@ import (
 	kithttp "github.com/go-kit/kit/transport/http"
 )
 
-const dictionary_url = "http://localhost:9090/dictionary/v1/random_word"
+const dictionaryURL = "http://localhost:9090/dictionary/v1/random_word"
 
 type (
 	// NewGameRequest requests a new game given a word
@@ -43,6 +43,7 @@ func decodeNewGameRequest(_ context.Context, r *http.Request) (interface{}, erro
 	return req, nil
 }
 
+// DecodeGuessRequest extracts guess and game state from requests
 func DecodeGuessRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req GuessRequest
 
